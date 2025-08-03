@@ -62,10 +62,9 @@ void Asteroids::Start()
 	mGameWorld->AddObject(CreateSpaceship());
 	// Create some asteroids and add them to the world
 	CreateAsteroids(10);
-
-	//Create the GUI
-	CreateGUI();
-
+	// CUSTOM
+	CreateStartGUI();
+	// END
 	// Add a player (watcher) to the game world
 	mGameWorld->AddListener(&mPlayer);
 
@@ -87,13 +86,66 @@ void Asteroids::Stop()
 
 void Asteroids::OnKeyPressed(uchar key, int x, int y)
 {
-	switch (key)
-	{
-	case ' ':
-		mSpaceship->Shoot();
-		break;
-	default:
-		break;
+	if (mScoreSaveScreen) {
+		switch (key)
+		{
+		case '1':
+			mScoreSaveLabel->SetVisible(false);
+			mCancelScoreSaveLabel -> SetVisible(false);
+			CreateAskNameGUI();
+			mScoreSaveScreen = false;
+			return;
+		case '2':
+			mScoreSaveLabel->SetVisible(false);
+			mCancelScoreSaveLabel->SetVisible(false);
+			SetTimer(500, SHOW_GAME_OVER);
+			mScoreSaveScreen = false;
+			return;
+		}
+	}
+	if (mNameScreen) {
+		if (key == 13) { // ENTER key
+			// Save name + score
+			SaveHighScore(mNameInput, mCurrentScore);
+			mNameInput = "";
+			mNameScreen = false;
+			mEnterHintLabel->SetVisible(false);
+			SetTimer(500, SHOW_GAME_OVER);
+		}
+		else if (key == 8 && !mNameInput.empty()) { // BACKSPACE
+			mNameInput.pop_back();
+		}
+		else if (isprint(key)) {
+			mNameInput += key;
+		}
+
+		// Update label with current name input
+		mNameLabel->SetText(mNameInput);
+		return;
+	}
+	if (mGameStart == true) {
+		switch (key)
+		{
+		case ' ':
+			mSpaceship->Shoot();
+			break;
+		default:
+			break;
+		}
+	}
+	else if (!mGameStart && mInstructionsScreen) {
+		switch (key)
+		{
+		case 'b':
+			HideInstructionsGUI();
+			ShowStartGUI();
+			mInstructionsScreen = false;
+
+			
+		}
+	}
+	else {
+		StartControls(key);
 	}
 }
 
@@ -101,32 +153,41 @@ void Asteroids::OnKeyReleased(uchar key, int x, int y) {}
 
 void Asteroids::OnSpecialKeyPressed(int key, int x, int y)
 {
-	switch (key)
-	{
-	// If up arrow key is pressed start applying forward thrust
-	case GLUT_KEY_UP: mSpaceship->Thrust(10); break;
-	// If left arrow key is pressed start rotating anti-clockwise
-	case GLUT_KEY_LEFT: mSpaceship->Rotate(90); break;
-	// If right arrow key is pressed start rotating clockwise
-	case GLUT_KEY_RIGHT: mSpaceship->Rotate(-90); break;
-	// Default case - do nothing
-	default: break;
+	if (mGameStart == true) {
+		switch (key)
+		{
+			// If up arrow key is pressed start applying forward thrust
+		case GLUT_KEY_UP: mSpaceship->Thrust(10); break;
+			// If left arrow key is pressed start rotating anti-clockwise
+		case GLUT_KEY_LEFT: mSpaceship->Rotate(90); break;
+			// If right arrow key is pressed start rotating clockwise
+		case GLUT_KEY_RIGHT: mSpaceship->Rotate(-90); break;
+			// Default case - do nothing
+		default: break;
+		}
 	}
+	
+	
 }
 
 void Asteroids::OnSpecialKeyReleased(int key, int x, int y)
 {
-	switch (key)
-	{
-	// If up arrow key is released stop applying forward thrust
-	case GLUT_KEY_UP: mSpaceship->Thrust(0); break;
-	// If left arrow key is released stop rotating
-	case GLUT_KEY_LEFT: mSpaceship->Rotate(0); break;
-	// If right arrow key is released stop rotating
-	case GLUT_KEY_RIGHT: mSpaceship->Rotate(0); break;
-	// Default case - do nothing
-	default: break;
-	} 
+	if (mGameStart == true) {
+		switch (key)
+		{
+			// If up arrow key is released stop applying forward thrust
+		case GLUT_KEY_UP: mSpaceship->Thrust(0); break;
+			// If left arrow key is released stop rotating
+		case GLUT_KEY_LEFT: mSpaceship->Rotate(0); break;
+			// If right arrow key is released stop rotating
+		case GLUT_KEY_RIGHT: mSpaceship->Rotate(0); break;
+			// Default case - do nothing
+		default: break;
+		}
+	}
+	
+	
+	
 }
 
 
@@ -248,12 +309,18 @@ void Asteroids::CreateGUI()
 
 void Asteroids::OnScoreChanged(int score)
 {
+	// CUSTOM
+	// track the current score
+	mCurrentScore = score;
+	// END 
+	 
 	// Format the score message using an string-based stream
 	std::ostringstream msg_stream;
 	msg_stream << "Score: " << score;
 	// Get the score message as a string
 	std::string score_msg = msg_stream.str();
 	mScoreLabel->SetText(score_msg);
+
 }
 
 void Asteroids::OnPlayerKilled(int lives_left)
@@ -276,7 +343,9 @@ void Asteroids::OnPlayerKilled(int lives_left)
 	}
 	else
 	{
-		SetTimer(500, SHOW_GAME_OVER);
+		CreateScoreSaveGUI();
+		//CreateAskNameGUI();
+		// SetTimer(500, SHOW_GAME_OVER);
 	}
 }
 
@@ -291,6 +360,227 @@ shared_ptr<GameObject> Asteroids::CreateExplosion()
 	explosion->Reset();
 	return explosion;
 }
+
+// CUSTOM
+void Asteroids::CreateStartGUI()
+{
+	mHeaderLabel = make_shared<GUILabel>("Asteroids Game");
+	mHeaderLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
+	mHeaderLabel->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
+	shared_ptr<GUIComponent> header_component
+		= static_pointer_cast<GUIComponent>(mHeaderLabel);
+	mGameDisplay->GetContainer()->AddComponent(header_component, GLVector2f(0.5f, 0.93f));
+
+	mStartLabel = make_shared<GUILabel>("Press 1 to Start");
+	mStartLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
+	mStartLabel->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
+	shared_ptr<GUIComponent> start_component
+		= static_pointer_cast<GUIComponent>(mStartLabel);
+	mGameDisplay->GetContainer()->AddComponent(start_component, GLVector2f(0.5f, 0.8f));
+
+	mDifficultyLabel = make_shared<GUILabel>("Press 2 to Change Difficulty");
+	mDifficultyLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
+	mDifficultyLabel->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
+	shared_ptr<GUIComponent> difficulty_component
+		= static_pointer_cast<GUIComponent>(mDifficultyLabel);
+	mGameDisplay->GetContainer()->AddComponent(difficulty_component, GLVector2f(0.5f, 0.6f));
+
+	mInstructionsLabel = make_shared<GUILabel>("Press 3 to View Instructions");
+	mInstructionsLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
+	mInstructionsLabel->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
+	shared_ptr<GUIComponent> instructions_component
+		= static_pointer_cast<GUIComponent>(mInstructionsLabel);
+	mGameDisplay->GetContainer()->AddComponent(instructions_component, GLVector2f(0.5f, 0.4f));
+
+	mTableLabel = make_shared<GUILabel>("Press 4 to View Scores");
+	mTableLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
+	mTableLabel->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
+	shared_ptr<GUIComponent> table_component
+		= static_pointer_cast<GUIComponent>(mTableLabel);
+	mGameDisplay->GetContainer()->AddComponent(table_component, GLVector2f(0.5f, 0.2f));
+}
+
+void Asteroids::HideDefaultGUI() 
+{
+	mScoreLabel->SetVisible(false);
+	mLivesLabel->SetVisible(false);	
+}
+void Asteroids::HideStartGUI()
+{
+	mHeaderLabel->SetVisible(false);
+	mStartLabel->SetVisible(false);
+	mDifficultyLabel->SetVisible(false);
+	mInstructionsLabel->SetVisible(false);
+	mTableLabel->SetVisible(false);
+}
+void Asteroids::ShowDefaultGUI()
+{
+	mScoreLabel->SetVisible(true);
+	mLivesLabel->SetVisible(true);
+}
+void Asteroids::ShowStartGUI()
+{
+	mHeaderLabel->SetVisible(true);
+	mStartLabel->SetVisible(true);
+	mDifficultyLabel->SetVisible(true);
+	mInstructionsLabel->SetVisible(true);
+	mTableLabel->SetVisible(true);
+}
+void Asteroids::CreateInstructionsGUI() {
+
+	mInstruction1 = make_shared<GUILabel>("Arrows Keys To Navigate Spaceship");
+	mInstruction1->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
+	mInstruction1->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
+	shared_ptr<GUIComponent> instruction1_component
+		= static_pointer_cast<GUIComponent>(mInstruction1);
+	mGameDisplay->GetContainer()->AddComponent(instruction1_component, GLVector2f(0.5f, 0.8f));
+
+	mInstruction2 = make_shared<GUILabel>("Spacebar to Shoot Spaceship");
+	mInstruction2->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
+	mInstruction2->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
+	shared_ptr<GUIComponent> instruction2_component
+		= static_pointer_cast<GUIComponent>(mInstruction2);
+	mGameDisplay->GetContainer()->AddComponent(instruction2_component, GLVector2f(0.5f, 0.7f));
+
+	mInstruction3 = make_shared<GUILabel>("Destory The Asteroids");
+	mInstruction3->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
+	mInstruction3->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
+	shared_ptr<GUIComponent> instruction3_component
+		= static_pointer_cast<GUIComponent>(mInstruction3);
+	mGameDisplay->GetContainer()->AddComponent(instruction3_component, GLVector2f(0.5f, 0.6f));
+
+	mInstruction4 = make_shared<GUILabel>("Save Your Score At The End (Name)");
+	mInstruction4->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
+	mInstruction4->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
+	shared_ptr<GUIComponent> instruction4_component
+		= static_pointer_cast<GUIComponent>(mInstruction4);
+	mGameDisplay->GetContainer()->AddComponent(instruction4_component, GLVector2f(0.5f, 0.5f));
+
+	mInstruction5 = make_shared<GUILabel>("View Saved Scores From The Start Menu");
+	mInstruction5->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
+	mInstruction5->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
+	shared_ptr<GUIComponent> instruction5_component
+		= static_pointer_cast<GUIComponent>(mInstruction5);
+	mGameDisplay->GetContainer()->AddComponent(instruction5_component, GLVector2f(0.5f, 0.4f));
+
+	mInstruction6 = make_shared<GUILabel>("Change Difficulty From The Start Menu");
+	mInstruction6->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
+	mInstruction6->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
+	shared_ptr<GUIComponent> instruction6_component
+		= static_pointer_cast<GUIComponent>(mInstruction6);
+	mGameDisplay->GetContainer()->AddComponent(instruction6_component, GLVector2f(0.5f, 0.3f));
+
+	mInstruction7 = make_shared<GUILabel>("Press b To Return To Start Menu");
+	mInstruction7->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
+	mInstruction7->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
+	shared_ptr<GUIComponent> instruction7_component
+		= static_pointer_cast<GUIComponent>(mInstruction7);
+	mGameDisplay->GetContainer()->AddComponent(instruction7_component, GLVector2f(0.5f, 0.2f));
+}
+
+void Asteroids::HideInstructionsGUI() {
+	mInstruction1->SetVisible(false);
+	mInstruction2->SetVisible(false);
+	mInstruction3->SetVisible(false);
+	mInstruction4->SetVisible(false);
+	mInstruction5->SetVisible(false);
+	mInstruction6->SetVisible(false);
+	mInstruction7->SetVisible(false);
+}
+void Asteroids::ShowInstructionsGUI() {
+	mInstruction1->SetVisible(true);
+	mInstruction2->SetVisible(true);
+	mInstruction3->SetVisible(true);
+	mInstruction4->SetVisible(true);
+	mInstruction5->SetVisible(true);
+	mInstruction6->SetVisible(true);
+	mInstruction7->SetVisible(true);
+}
+
+void Asteroids::StartControls(int key)
+{
+	switch (key)
+	{
+	case '1':
+		HideStartGUI();
+		CreateGUI();
+		mGameStart = true;
+		break;
+	case '3':
+		// optimisation
+		if (!mInstructionsCreated) {
+			CreateInstructionsGUI();
+			mInstructionsCreated = true;
+		}
+		else {
+			ShowInstructionsGUI();
+		}
+		HideStartGUI();
+		mInstructionsScreen = true;
+		break;
+	default:
+		break;
+	}
+}
+void Asteroids::GameControls(int key) {
+
+}
+void Asteroids::CreateScoreSaveGUI() {
+	mScoreSaveScreen = true;
+	mScoreSaveLabel = make_shared<GUILabel>("Press 1 to Save Score");
+	mScoreSaveLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
+	mScoreSaveLabel->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
+	shared_ptr<GUIComponent> save_component
+		= static_pointer_cast<GUIComponent>(mScoreSaveLabel);
+	mGameDisplay->GetContainer()->AddComponent(save_component, GLVector2f(0.5f, 0.6f));
+
+	mCancelScoreSaveLabel = make_shared<GUILabel>("(Press 2 to Discard Score)");
+	mCancelScoreSaveLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
+	mCancelScoreSaveLabel->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
+	shared_ptr<GUIComponent> cancel_component
+		= static_pointer_cast<GUIComponent>(mCancelScoreSaveLabel);
+	mGameDisplay->GetContainer()->AddComponent(cancel_component, GLVector2f(0.5f, 0.4f));
+}
+
+void Asteroids::CreateAskNameGUI() {
+	mGameStart = false;
+	mNameScreen = true;
+	mScoreSaveScreen = false;
+	// name input displays (string declared in header) 
+	mNameInput = "";
+
+
+	mNameLabel = make_shared<GUILabel>("Provide Your Name");
+	mNameLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
+	mNameLabel->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
+	shared_ptr<GUIComponent> name_component
+		= static_pointer_cast<GUIComponent>(mNameLabel);
+	mGameDisplay->GetContainer()->AddComponent(name_component, GLVector2f(0.5f, 0.6f));
+
+	mEnterHintLabel = make_shared<GUILabel>("(Press Enter After Providing Name)");
+	mEnterHintLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
+	mEnterHintLabel->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
+	shared_ptr<GUIComponent> enter_component
+		= static_pointer_cast<GUIComponent>(mEnterHintLabel);
+	mGameDisplay->GetContainer()->AddComponent(enter_component, GLVector2f(0.5f, 0.4f));
+
+}
+void Asteroids::SaveHighScore(const std::string& name, int score)
+{
+	std::ofstream file("highscores.txt", std::ios::app); // append mode
+
+	if (file.is_open()) {
+		file << name << " " << score << std::endl;
+		file.close();
+	}
+	else {
+		// doesnt print due to setup but still implement good practise 
+		std::cerr << "Error: Could not open highscores.txt for writing." << std::endl;
+	}
+}
+
+
+// END 
 
 
 

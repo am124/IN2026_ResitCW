@@ -68,6 +68,49 @@ private:
 
 	ScoreKeeper mScoreKeeper;
 	Player mPlayer;
+
+	// CUSTOM
+	shared_ptr<GUILabel> mHeaderLabel;
+	shared_ptr<GUILabel> mStartLabel;
+	shared_ptr<GUILabel> mDifficultyLabel;
+	shared_ptr<GUILabel> mInstructionsLabel;
+	shared_ptr<GUILabel> mTableLabel;
+	shared_ptr<GUILabel> mInstruction1;
+	shared_ptr<GUILabel> mInstruction2;
+	shared_ptr<GUILabel> mInstruction3;
+	shared_ptr<GUILabel> mInstruction4;
+	shared_ptr<GUILabel> mInstruction5;
+	shared_ptr<GUILabel> mInstruction6;
+	shared_ptr<GUILabel> mInstruction7;
+
+	void CreateStartGUI();
+	void HideDefaultGUI();
+	void HideStartGUI();
+	void ShowDefaultGUI();
+	void ShowStartGUI();
+	void CreateInstructionsGUI();
+	void HideInstructionsGUI();
+	void ShowInstructionsGUI();
+	void StartControls(int key);
+	void GameControls(int key);
+	bool mGameStart = false;
+	bool mInstructionsScreen = false;
+	bool mInstructionsCreated = false;
+
+	void CreateScoreSaveGUI();
+	bool mScoreSaveScreen = false;
+	shared_ptr<GUILabel> mScoreSaveLabel;
+	shared_ptr<GUILabel> mCancelScoreSaveLabel;
+
+	void CreateAskNameGUI();
+	std::string mNameInput;
+	shared_ptr<GUILabel> mNameLabel;
+	shared_ptr<GUILabel> mEnterHintLabel;
+	bool mNameScreen = false;
+	int mCurrentScore = 0;
+	// END
+
+	void SaveHighScore(const std::string& name, int score);
 };
 
 #endif
