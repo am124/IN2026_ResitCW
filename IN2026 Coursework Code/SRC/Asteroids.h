@@ -9,6 +9,9 @@
 #include "ScoreKeeper.h"
 #include "Player.h"
 #include "IPlayerListener.h"
+#include <vector>
+
+
 
 class GameObject;
 class Spaceship;
@@ -108,9 +111,27 @@ private:
 	shared_ptr<GUILabel> mEnterHintLabel;
 	bool mNameScreen = false;
 	int mCurrentScore = 0;
-	// END
 
 	void SaveHighScore(const std::string& name, int score);
+
+	void ShowHighScoresGUI();
+	void HideHighScoresGUI();
+	bool mHighScoresScreen = false;
+	std::vector<shared_ptr<GUILabel>> mScoreLabels;
+	shared_ptr<GUILabel> mHighScoresHeader;
+	shared_ptr<GUILabel> mBackHintLabel;
+	
+	bool mIsHard = false; 
+	bool mDifficultyScreen = false; 
+	shared_ptr<GUILabel> mDifficultyHeaderLabel;
+	shared_ptr<GUILabel> mStandardOptionLabel;
+	shared_ptr<GUILabel> mHardOptionLabel;
+	shared_ptr<GUILabel> mCurrentDifficultyLabel;
+	shared_ptr<GUILabel> mBackLabelDifficulty;
+	void CreateDifficultyGUI();
+	void HideDifficultyGUI();
+	// END
+
 };
 
 #endif

@@ -103,7 +103,25 @@ void Asteroids::OnKeyPressed(uchar key, int x, int y)
 			return;
 		}
 	}
-	if (mNameScreen) {
+	else if (mDifficultyScreen) {
+		switch (key) {
+		case '1':
+			mIsHard = false;
+			mCurrentDifficultyLabel->SetText("Current: Standard");
+			break;
+		case '2':
+			mIsHard = true;
+			mCurrentDifficultyLabel->SetText("Current: Hard");
+			break;
+		case 'b':
+			HideDifficultyGUI();
+			ShowStartGUI();
+			break;
+		}
+		return;
+	}
+
+	else if (mNameScreen) {
 		if (key == 13) { // ENTER key
 			// Save name + score
 			SaveHighScore(mNameInput, mCurrentScore);
@@ -123,7 +141,14 @@ void Asteroids::OnKeyPressed(uchar key, int x, int y)
 		mNameLabel->SetText(mNameInput);
 		return;
 	}
-	if (mGameStart == true) {
+	else if (mHighScoresScreen) {
+		if (key == 'b') {
+			HideHighScoresGUI();
+			ShowStartGUI();
+		}
+	}
+
+	else if (mGameStart == true) {
 		switch (key)
 		{
 		case ' ':
@@ -470,7 +495,7 @@ void Asteroids::CreateInstructionsGUI() {
 		= static_pointer_cast<GUIComponent>(mInstruction6);
 	mGameDisplay->GetContainer()->AddComponent(instruction6_component, GLVector2f(0.5f, 0.3f));
 
-	mInstruction7 = make_shared<GUILabel>("Press b To Return To Start Menu");
+	mInstruction7 = make_shared<GUILabel>("Press b to Return");
 	mInstruction7->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
 	mInstruction7->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
 	shared_ptr<GUIComponent> instruction7_component
@@ -506,6 +531,11 @@ void Asteroids::StartControls(int key)
 		CreateGUI();
 		mGameStart = true;
 		break;
+	case '2':
+		HideStartGUI();
+		CreateDifficultyGUI();
+		mDifficultyScreen = true;
+		break;
 	case '3':
 		// optimisation
 		if (!mInstructionsCreated) {
@@ -517,6 +547,10 @@ void Asteroids::StartControls(int key)
 		}
 		HideStartGUI();
 		mInstructionsScreen = true;
+		break;
+	case '4':
+		HideStartGUI();
+		ShowHighScoresGUI();
 		break;
 	default:
 		break;
@@ -567,7 +601,7 @@ void Asteroids::CreateAskNameGUI() {
 }
 void Asteroids::SaveHighScore(const std::string& name, int score)
 {
-	std::ofstream file("highscores.txt", std::ios::app); // append mode
+	std::ofstream file("highscores.txt", std::ios::app); 
 
 	if (file.is_open()) {
 		file << name << " " << score << std::endl;
@@ -577,6 +611,120 @@ void Asteroids::SaveHighScore(const std::string& name, int score)
 		// doesnt print due to setup but still implement good practise 
 		std::cerr << "Error: Could not open highscores.txt for writing." << std::endl;
 	}
+}
+void Asteroids::ShowHighScoresGUI() {
+	mHighScoresScreen = true;
+
+	std::ifstream file("highscores.txt");
+	if (!file.is_open()) {
+		std::cerr << "Could not open highscores.txt" << std::endl;
+		return;
+	}
+
+	// header 
+	mHighScoresHeader = make_shared<GUILabel>("High Scores");
+	mHighScoresHeader->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
+	mHighScoresHeader->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
+	mGameDisplay->GetContainer()->AddComponent(
+		static_pointer_cast<GUIComponent>(mHighScoresHeader), GLVector2f(0.5f, 0.9f)
+	);
+
+	// read lines
+	std::string line;
+	int index = 0;
+	while (std::getline(file, line)) {
+		std::istringstream iss(line);
+		std::string name;
+		int score;
+		// restart the loop if potentially malformed (correct row order 
+		// not maintained)
+		if (!(iss >> name >> score)) continue;
+
+		std::ostringstream labelText;
+		labelText << index + 1 << ". " << name << " - " << score;
+
+		auto label = make_shared<GUILabel>(labelText.str());
+		label->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
+		label->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
+
+		mGameDisplay->GetContainer()->AddComponent(
+			static_pointer_cast<GUIComponent>(label), GLVector2f(0.5f, 0.8f - index * 0.05f)
+		);
+
+		mScoreLabels.push_back(label);
+		index++;
+		if (index >= 10) break; // Show top 10
+	}
+
+	
+	mBackHintLabel = make_shared<GUILabel>("Press b to Return");
+	mBackHintLabel->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
+	mBackHintLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_BOTTOM);
+	mGameDisplay->GetContainer()->AddComponent(
+		static_pointer_cast<GUIComponent>(mBackHintLabel), GLVector2f(0.5f, 0.05f)
+	);
+
+}
+void Asteroids::HideHighScoresGUI() {
+	mHighScoresScreen = false;
+
+	for (auto& label : mScoreLabels) {
+		label->SetVisible(false);
+	}
+	mScoreLabels.clear();
+
+	if (mHighScoresHeader) mHighScoresHeader->SetVisible(false);
+	if (mBackHintLabel) mBackHintLabel->SetVisible(false);
+}
+
+void Asteroids::CreateDifficultyGUI() {
+	mDifficultyScreen = true;
+
+	mDifficultyHeaderLabel = make_shared<GUILabel>("Select Difficulty:");
+	mDifficultyHeaderLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
+	mDifficultyHeaderLabel->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
+	mGameDisplay->GetContainer()->AddComponent(
+		static_pointer_cast<GUIComponent>(mDifficultyHeaderLabel), GLVector2f(0.5f, 0.8f));
+
+	mStandardOptionLabel = make_shared<GUILabel>("Press 1 for Standard");
+	mStandardOptionLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
+	mStandardOptionLabel->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
+	mGameDisplay->GetContainer()->AddComponent(
+		static_pointer_cast<GUIComponent>(mStandardOptionLabel), GLVector2f(0.5f, 0.6f));
+
+	mHardOptionLabel = make_shared<GUILabel>("Press 2 for Hard");
+	mHardOptionLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
+	mHardOptionLabel->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
+	mGameDisplay->GetContainer()->AddComponent(
+		static_pointer_cast<GUIComponent>(mHardOptionLabel), GLVector2f(0.5f, 0.5f));
+
+	std::string currentLabelText;
+	if (mIsHard) {
+		currentLabelText = "Current: Hard";
+	}
+	else {
+		currentLabelText = "Current: Standard";
+	}
+	mCurrentDifficultyLabel = make_shared<GUILabel>(currentLabelText);
+	mCurrentDifficultyLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
+	mCurrentDifficultyLabel->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
+	mGameDisplay->GetContainer()->AddComponent(
+		static_pointer_cast<GUIComponent>(mCurrentDifficultyLabel), GLVector2f(0.5f, 0.3f));
+
+	mBackLabelDifficulty = make_shared<GUILabel>("Press b to Return");
+	mBackLabelDifficulty->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
+	mBackLabelDifficulty->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
+	mGameDisplay->GetContainer()->AddComponent(
+		static_pointer_cast<GUIComponent>(mBackLabelDifficulty), GLVector2f(0.5f, 0.2f));
+
+}
+void Asteroids::HideDifficultyGUI() {
+	mDifficultyHeaderLabel->SetVisible(false);
+	mStandardOptionLabel->SetVisible(false);
+	mHardOptionLabel->SetVisible(false);
+	mCurrentDifficultyLabel->SetVisible(false);
+	mBackLabelDifficulty->SetVisible(false);
+	mDifficultyScreen = false;
 }
 
 
