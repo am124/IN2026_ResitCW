@@ -111,12 +111,13 @@ void Spaceship::OnCollision(const GameObjectList &objects)
 		if (obj->GetType() == GameObjectType("Invincible")) {
 			return; 
 		}
+		if (obj->GetType() == GameObjectType("Tuning")) {
+			return; 
+		}
 	}
 	if (mPlayer && mPlayer->IsInvincible()) {
 		return;
 	}
-
-
 
 	// END
 	// Otherwise, treat it as a harmful collision

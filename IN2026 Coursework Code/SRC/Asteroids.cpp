@@ -14,6 +14,7 @@
 
 #include "ExtraLives.h"
 #include "Invincible.h"
+#include "Tuning.h"
 
 
 
@@ -67,11 +68,7 @@ void Asteroids::Start()
 	mGameWorld->AddObject(CreateSpaceship());
 	// Create some asteroids and add them to the world
 	CreateAsteroids(10);
-	// CUSTOM
-	// spawns first life, here use a boolean for difficulty to change timer
-	SetTimer(6000, SPAWN_EXTRA_LIFE);
-	SetTimer(3000, SPAWN_INVINCIBLE);
-
+	
 	CreateStartGUI();
 	// END
 	// Add a player (watcher) to the game world
@@ -188,6 +185,11 @@ void Asteroids::OnKeyReleased(uchar key, int x, int y) {}
 void Asteroids::OnSpecialKeyPressed(int key, int x, int y)
 {
 	if (mGameStart == true) {
+		// CUSTOM
+		if (key == GLUT_KEY_DOWN && mTuningPickedUp) {
+			mSpaceship->Thrust(-12);
+		}
+		// END 
 		switch (key)
 		{
 			// If up arrow key is pressed start applying forward thrust
@@ -207,6 +209,11 @@ void Asteroids::OnSpecialKeyPressed(int key, int x, int y)
 void Asteroids::OnSpecialKeyReleased(int key, int x, int y)
 {
 	if (mGameStart == true) {
+		// CUSTOM
+		if (key == GLUT_KEY_DOWN && mTuningPickedUp) {
+			mSpaceship->Thrust(0);
+		}
+		// END 
 		switch (key)
 		{
 			// If up arrow key is released stop applying forward thrust
@@ -244,7 +251,10 @@ void Asteroids::OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object)
 	if (object->GetType() == GameObjectType("Invincible"))
 	{
 		mPlayer.EnableInvincibility();
-		SetTimer(100000, END_INVINCIBILITY);
+		SetTimer(5000, END_INVINCIBILITY);
+	}
+	if (object->GetType() == GameObjectType("Tuning")){
+		mTuningPickedUp = true; 
 	}
 
 }
@@ -274,16 +284,20 @@ void Asteroids::OnTimer(int value)
 	if (value == SPAWN_EXTRA_LIFE) {
 		SpawnExtraLife();
 		// schedules next spawn
-		SetTimer(15000, SPAWN_EXTRA_LIFE);
+		SetTimer(28000, SPAWN_EXTRA_LIFE);
 	}
 	if (value == SPAWN_INVINCIBLE) {
 		SpawnInvincible();
-		SetTimer(3000, SPAWN_INVINCIBLE);
+		SetTimer(20000, SPAWN_INVINCIBLE);
 
 	}
 	if (value == END_INVINCIBILITY) {
 		mPlayer.DisableInvincibility();
 	}
+	if (value == SPAWN_TUNING) {
+		SpawnTuning();
+	}
+	
 	// END 
 }
 
@@ -562,6 +576,13 @@ void Asteroids::StartControls(int key)
 		HideStartGUI();
 		CreateGUI();
 		mGameStart = true;
+		// CUSTOM
+		// spawns first life, here use a boolean for difficulty to change timer
+		if (!mIsHard) {
+			SetTimer(28000, SPAWN_EXTRA_LIFE);
+			SetTimer(20000, SPAWN_INVINCIBLE);
+			SetTimer(16000, SPAWN_TUNING);
+		}
 		break;
 	case '2':
 		HideStartGUI();
@@ -803,8 +824,20 @@ void Asteroids::SpawnInvincible() {
 	mGameWorld->AddObject(invincible);
 
 }
-
-
+void Asteroids::SpawnTuning() {
+	Animation* anim_ptr = AnimationManager::GetInstance().GetAnimationByName("spaceship");
+	shared_ptr<Sprite> tuning_sprite
+		= make_shared<Sprite>(anim_ptr->GetWidth(), anim_ptr->GetHeight(), anim_ptr);
+	tuning_sprite->SetLoopAnimation(true);
+	shared_ptr<GameObject> tuning = make_shared<Tuning>();
+	tuning->SetBoundingShape(make_shared<BoundingSphere>(tuning->GetThisPtr(), 10.0f));
+	tuning->SetSprite(tuning_sprite);
+	tuning->SetScale(0.14f);
+	GLfloat x = rand() % 200 - 100; // example range: [-100, 100]
+	GLfloat y = rand() % 200 - 100;
+	tuning->SetPosition(GLVector3f(x, y, 0));;
+	mGameWorld->AddObject(tuning);
+}
 
 
 // END 

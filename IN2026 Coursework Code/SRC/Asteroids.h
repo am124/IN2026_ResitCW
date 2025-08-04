@@ -75,6 +75,8 @@ private:
 	const static uint SPAWN_EXTRA_LIFE = 12;
 	const static uint END_INVINCIBILITY = 6;
 	const static uint SPAWN_INVINCIBLE = 20;
+	const static uint SPAWN_TUNING = 25;
+
 
 	// END 
 
@@ -143,6 +145,8 @@ private:
 	void SpawnExtraLife();
 	void SpawnInvincible();
 
+	void SpawnTuning();
+	bool mTuningPickedUp = false;
 
 
 	// END

@@ -27,6 +27,8 @@ bool Asteroid::CollisionTest(shared_ptr<GameObject> o)
 	if (GetType() == o->GetType()) return false;
 	if (o->GetType() == GameObjectType("ExtraLives")) return false;
 	if (o->GetType() == GameObjectType("Invincible")) return false;
+	if (o->GetType() == GameObjectType("Tuning")) return false;
+
 
 	if (mBoundingShape.get() == NULL) return false;
 	if (o->GetBoundingShape().get() == NULL) return false;

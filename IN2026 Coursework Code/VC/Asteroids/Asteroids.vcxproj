@@ -111,6 +111,7 @@
     <ClCompile Include="..\..\SRC\Invincible.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\Spaceship.cpp" />
+    <ClCompile Include="..\..\SRC\Tuning.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\SRC\Asteroid.h" />
@@ -124,6 +125,7 @@
     <ClInclude Include="..\..\SRC\Player.h" />
     <ClInclude Include="..\..\SRC\ScoreKeeper.h" />
     <ClInclude Include="..\..\src\Spaceship.h" />
+    <ClInclude Include="..\..\SRC\Tuning.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Engine\Engine.vcxproj">
