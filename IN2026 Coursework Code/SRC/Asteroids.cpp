@@ -12,6 +12,9 @@
 #include "GUILabel.h"
 #include "Explosion.h"
 
+#include "ExtraLives.h"
+
+
 // PUBLIC INSTANCE CONSTRUCTORS ///////////////////////////////////////////////
 
 /** Constructor. Takes arguments from command line, just in case. */
@@ -63,6 +66,8 @@ void Asteroids::Start()
 	// Create some asteroids and add them to the world
 	CreateAsteroids(10);
 	// CUSTOM
+	// spawns first life, here use a boolean for difficulty to change timer
+	SetTimer(6000, SPAWN_EXTRA_LIFE);
 	CreateStartGUI();
 	// END
 	// Add a player (watcher) to the game world
@@ -255,7 +260,13 @@ void Asteroids::OnTimer(int value)
 	{
 		mGameOverLabel->SetVisible(true);
 	}
-
+	// CUSTOM
+	if (value == SPAWN_EXTRA_LIFE) {
+		SpawnExtraLife();
+		// schedules next spawn
+		SetTimer(15000, SPAWN_EXTRA_LIFE);
+	}
+	// END 
 }
 
 // PROTECTED INSTANCE METHODS /////////////////////////////////////////////////
@@ -726,6 +737,38 @@ void Asteroids::HideDifficultyGUI() {
 	mBackLabelDifficulty->SetVisible(false);
 	mDifficultyScreen = false;
 }
+
+void Asteroids::OnPlayerPickedUpLife(int lives_left)
+{
+	
+
+	// Format the lives left message using an string-based stream
+	std::ostringstream msg_stream;
+	msg_stream << "Lives: " << lives_left;
+	// Get the lives left message as a string
+	std::string lives_msg = msg_stream.str();
+	mLivesLabel->SetText(lives_msg);
+
+}
+void Asteroids::SpawnExtraLife()
+{
+	// Create the pickup
+
+	Animation* anim_ptr = AnimationManager::GetInstance().GetAnimationByName("spaceship");
+	shared_ptr<Sprite> extralife_sprite
+		= make_shared<Sprite>(anim_ptr->GetWidth(), anim_ptr->GetHeight(), anim_ptr);
+	extralife_sprite->SetLoopAnimation(true);
+	shared_ptr<GameObject> extralife = make_shared<ExtraLives>();
+	extralife->SetBoundingShape(make_shared<BoundingSphere>(extralife->GetThisPtr(), 10.0f));
+	extralife->SetSprite(extralife_sprite);
+	extralife->SetScale(0.08f);
+	GLfloat x = rand() % 200 - 100; // example range: [-100, 100]
+	GLfloat y = rand() % 200 - 100;
+	extralife->SetPosition(GLVector3f(x, y, 0));;
+	mGameWorld->AddObject(extralife);
+}
+
+
 
 
 // END 

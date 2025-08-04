@@ -1,3 +1,0 @@
-adil 30
-adil 110
-new 130

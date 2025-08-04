@@ -50,6 +50,9 @@ public:
 	// Override the default implementation of ITimerListener ////////////////////
 	void OnTimer(int value);
 
+	// Custom
+	void OnPlayerPickedUpLife(int lives_left);
+
 private:
 	shared_ptr<Spaceship> mSpaceship;
 	shared_ptr<GUILabel> mScoreLabel;
@@ -130,6 +133,12 @@ private:
 	shared_ptr<GUILabel> mBackLabelDifficulty;
 	void CreateDifficultyGUI();
 	void HideDifficultyGUI();
+
+	void SpawnExtraLife();
+
+	const static uint SPAWN_EXTRA_LIFE = 12;
+
+
 	// END
 
 };

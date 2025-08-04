@@ -102,5 +102,16 @@ bool Spaceship::CollisionTest(shared_ptr<GameObject> o)
 
 void Spaceship::OnCollision(const GameObjectList &objects)
 {
+	for (auto obj : objects) {
+		if (obj->GetType() == GameObjectType("ExtraLives")) {
+			// It's a pickup, don't remove the spaceship
+			return;
+		}
+	}
+
+	// Otherwise, treat it as a harmful collision
 	mWorld->FlagForRemoval(GetThisPtr());
+	
 }
+
+

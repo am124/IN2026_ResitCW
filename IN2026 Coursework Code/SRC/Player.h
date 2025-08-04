@@ -8,6 +8,11 @@
 #include "IPlayerListener.h"
 #include "IGameWorldListener.h"
 
+// CUSTOM
+#include "ExtraLives.h"
+
+// END
+
 class Player : public IGameWorldListener
 {
 public:
@@ -24,6 +29,14 @@ public:
 			mLives -= 1;
 			FirePlayerKilled();
 		}
+		// CUSTOM
+		if (object->GetType() == GameObjectType("ExtraLives")) {
+			mLives += 1;
+			FireLivesPickedUp();
+			
+			
+		}
+		// END
 	}
 
 	void AddListener(shared_ptr<IPlayerListener> listener)
@@ -39,6 +52,15 @@ public:
 			(*lit)->OnPlayerKilled(mLives);
 		}
 	}
+	// CUSTOM 
+	void FireLivesPickedUp() {
+		// Send message to all listeners
+		for (PlayerListenerList::iterator lit = mListeners.begin();
+			lit != mListeners.end(); ++lit) {
+			(*lit)->OnPlayerPickedUpLife(mLives);
+		}
+	}
+	// END
 
 private:
 	int mLives;
