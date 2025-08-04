@@ -11,6 +11,7 @@
 // CUSTOM
 #include "ExtraLives.h"
 
+
 // END
 
 class Player : public IGameWorldListener
@@ -26,16 +27,18 @@ public:
 	void OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object)
 	{
 		if (object->GetType() == GameObjectType("Spaceship")) {
-			mLives -= 1;
-			FirePlayerKilled();
+			if (!mIsInvincible) {
+				mLives -= 1;
+				FirePlayerKilled();
+			}
+			
 		}
 		// CUSTOM
 		if (object->GetType() == GameObjectType("ExtraLives")) {
 			mLives += 1;
 			FireLivesPickedUp();
-			
-			
 		}
+		
 		// END
 	}
 
@@ -60,10 +63,22 @@ public:
 			(*lit)->OnPlayerPickedUpLife(mLives);
 		}
 	}
+	void EnableInvincibility() { 
+		mIsInvincible = true;
+	}
+	void DisableInvincibility() {
+		mIsInvincible = false;
+	}
+	bool IsInvincible() const { return mIsInvincible; }
 	// END
 
 private:
 	int mLives;
+	// CUSTOM
+	bool mIsInvincible = false; 
+	//int InvincibleDuration = 10000; 
+
+	// END 
 
 	typedef std::list< shared_ptr<IPlayerListener> > PlayerListenerList;
 

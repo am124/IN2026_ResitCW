@@ -2,6 +2,9 @@
 #include "Bullet.h"
 #include "BoundingSphere.h"
 
+#include "Asteroid.h"
+
+
 // PUBLIC INSTANCE CONSTRUCTORS ///////////////////////////////////////////////
 
 /** Constructor. Bullets live for 2s by default. */

@@ -4,6 +4,8 @@
 #include "GameUtil.h"
 #include "GameObject.h"
 #include "Shape.h"
+#include "Player.h"
+
 
 class Spaceship : public GameObject
 {
@@ -26,6 +28,15 @@ public:
 
 	bool CollisionTest(shared_ptr<GameObject> o);
 	void OnCollision(const GameObjectList &objects);
+	
+	// CUSTOM
+	void SetPlayer(Player* player) {
+		mPlayer = player;
+	}
+	Player* GetPlayer() const {
+		return mPlayer; 
+	}
+	// END 
 
 private:
 	float mThrust;
@@ -33,6 +44,9 @@ private:
 	shared_ptr<Shape> mSpaceshipShape;
 	shared_ptr<Shape> mThrusterShape;
 	shared_ptr<Shape> mBulletShape;
+	// CUSTOM
+	Player* mPlayer = nullptr;
+	// END
 };
 
 #endif

@@ -71,6 +71,12 @@ private:
 	const static uint SHOW_GAME_OVER = 0;
 	const static uint START_NEXT_LEVEL = 1;
 	const static uint CREATE_NEW_PLAYER = 2;
+	// CUSTOM
+	const static uint SPAWN_EXTRA_LIFE = 12;
+	const static uint END_INVINCIBILITY = 6;
+	const static uint SPAWN_INVINCIBLE = 20;
+
+	// END 
 
 	ScoreKeeper mScoreKeeper;
 	Player mPlayer;
@@ -135,8 +141,8 @@ private:
 	void HideDifficultyGUI();
 
 	void SpawnExtraLife();
+	void SpawnInvincible();
 
-	const static uint SPAWN_EXTRA_LIFE = 12;
 
 
 	// END

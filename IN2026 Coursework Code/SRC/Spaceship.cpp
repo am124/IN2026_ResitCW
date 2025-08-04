@@ -4,6 +4,7 @@
 #include "Spaceship.h"
 #include "BoundingSphere.h"
 
+
 using namespace std;
 
 // PUBLIC INSTANCE CONSTRUCTORS ///////////////////////////////////////////////
@@ -101,14 +102,23 @@ bool Spaceship::CollisionTest(shared_ptr<GameObject> o)
 }
 
 void Spaceship::OnCollision(const GameObjectList &objects)
-{
+{ // CUSTOM
 	for (auto obj : objects) {
 		if (obj->GetType() == GameObjectType("ExtraLives")) {
 			// It's a pickup, don't remove the spaceship
 			return;
 		}
+		if (obj->GetType() == GameObjectType("Invincible")) {
+			return; 
+		}
+	}
+	if (mPlayer && mPlayer->IsInvincible()) {
+		return;
 	}
 
+
+
+	// END
 	// Otherwise, treat it as a harmful collision
 	mWorld->FlagForRemoval(GetThisPtr());
 	

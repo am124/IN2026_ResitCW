@@ -13,6 +13,8 @@
 #include "Explosion.h"
 
 #include "ExtraLives.h"
+#include "Invincible.h"
+
 
 
 // PUBLIC INSTANCE CONSTRUCTORS ///////////////////////////////////////////////
@@ -68,6 +70,8 @@ void Asteroids::Start()
 	// CUSTOM
 	// spawns first life, here use a boolean for difficulty to change timer
 	SetTimer(6000, SPAWN_EXTRA_LIFE);
+	SetTimer(3000, SPAWN_INVINCIBLE);
+
 	CreateStartGUI();
 	// END
 	// Add a player (watcher) to the game world
@@ -237,6 +241,12 @@ void Asteroids::OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object)
 			SetTimer(500, START_NEXT_LEVEL); 
 		}
 	}
+	if (object->GetType() == GameObjectType("Invincible"))
+	{
+		mPlayer.EnableInvincibility();
+		SetTimer(100000, END_INVINCIBILITY);
+	}
+
 }
 
 // PUBLIC INSTANCE METHODS IMPLEMENTING ITimerListener ////////////////////////
@@ -266,6 +276,14 @@ void Asteroids::OnTimer(int value)
 		// schedules next spawn
 		SetTimer(15000, SPAWN_EXTRA_LIFE);
 	}
+	if (value == SPAWN_INVINCIBLE) {
+		SpawnInvincible();
+		SetTimer(3000, SPAWN_INVINCIBLE);
+
+	}
+	if (value == END_INVINCIBILITY) {
+		mPlayer.DisableInvincibility();
+	}
 	// END 
 }
 
@@ -275,6 +293,9 @@ shared_ptr<GameObject> Asteroids::CreateSpaceship()
 	// Create a raw pointer to a spaceship that can be converted to
 	// shared_ptrs of different types because GameWorld implements IRefCount
 	mSpaceship = make_shared<Spaceship>();
+	// CUSTOM
+	mSpaceship->SetPlayer(&mPlayer);
+	// END
 	mSpaceship->SetBoundingShape(make_shared<BoundingSphere>(mSpaceship->GetThisPtr(), 4.0f));
 	shared_ptr<Shape> bullet_shape = make_shared<Shape>("bullet.shape");
 	mSpaceship->SetBulletShape(bullet_shape);
@@ -766,6 +787,21 @@ void Asteroids::SpawnExtraLife()
 	GLfloat y = rand() % 200 - 100;
 	extralife->SetPosition(GLVector3f(x, y, 0));;
 	mGameWorld->AddObject(extralife);
+}
+void Asteroids::SpawnInvincible() {
+	Animation* anim_ptr = AnimationManager::GetInstance().GetAnimationByName("asteroid1");
+	shared_ptr<Sprite> invincible_sprite
+		= make_shared<Sprite>(anim_ptr->GetWidth(), anim_ptr->GetHeight(), anim_ptr);
+	invincible_sprite->SetLoopAnimation(true);
+	shared_ptr<GameObject> invincible = make_shared<Invincible>();
+	invincible->SetBoundingShape(make_shared<BoundingSphere>(invincible->GetThisPtr(), 10.0f));
+	invincible->SetSprite(invincible_sprite);
+	invincible->SetScale(0.08f);
+	GLfloat x = rand() % 200 - 100; // example range: [-100, 100]
+	GLfloat y = rand() % 200 - 100;
+	invincible->SetPosition(GLVector3f(x, y, 0));;
+	mGameWorld->AddObject(invincible);
+
 }
 
 

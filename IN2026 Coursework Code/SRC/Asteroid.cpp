@@ -2,6 +2,9 @@
 #include "GameUtil.h"
 #include "Asteroid.h"
 #include "BoundingShape.h"
+#include "Spaceship.h"
+
+
 
 Asteroid::Asteroid(void) : GameObject("Asteroid")
 {
@@ -23,6 +26,8 @@ bool Asteroid::CollisionTest(shared_ptr<GameObject> o)
 {
 	if (GetType() == o->GetType()) return false;
 	if (o->GetType() == GameObjectType("ExtraLives")) return false;
+	if (o->GetType() == GameObjectType("Invincible")) return false;
+
 	if (mBoundingShape.get() == NULL) return false;
 	if (o->GetBoundingShape().get() == NULL) return false;
 	return mBoundingShape->CollisionTest(o->GetBoundingShape());
@@ -30,6 +35,20 @@ bool Asteroid::CollisionTest(shared_ptr<GameObject> o)
 
 void Asteroid::OnCollision(const GameObjectList& objects)
 {
+	// CUSTOM
+	for (auto obj : objects) {
+		if (obj->GetType() == GameObjectType("Spaceship")) {
+			// check if it's invincible
+			shared_ptr<Spaceship> ship = dynamic_pointer_cast<Spaceship>(obj);
+			if (ship && ship->GetPlayer() && ship->GetPlayer()->IsInvincible()) {
+				// ignore invincible spaceship
+				return;
+			}
+		}
+	}
+	// END 
+	// otherwise, destroy the asteroid
 	mWorld->FlagForRemoval(GetThisPtr());
 }
+
 
