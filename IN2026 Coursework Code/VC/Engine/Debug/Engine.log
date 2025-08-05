@@ -2,26 +2,26 @@
   TextureManager.cpp
   Texture.cpp
   Sprite.cpp
-  Shape.cpp
   MovementController.cpp
   ImageManager.cpp
   Image.cpp
-  GUILabel.cpp
-  GUIIcon.cpp
-  GUIContainer.cpp
-  GUIComponent.cpp
-  GLVector.cpp
   GlutWindow.cpp
   GlutSession.cpp
   GameWorld.cpp
   GameWindow.cpp
   GameSession.cpp
-  GameObjectType.cpp
   GameObject.cpp
   GameDisplay.cpp
+  GUILabel.cpp
+  GUIIcon.cpp
+  GUIContainer.cpp
+  GUIComponent.cpp
+  GLVector.cpp
+  Shape.cpp
+  GameObjectType.cpp
   Generating Code...
   Compiling...
   AnimationManager.cpp
   Animation.cpp
   Generating Code...
-  Engine.vcxproj -> C:\Users\adil\Game Labs\IN2026_ResitCW\IN2026 Coursework Code\lib\Engine.lib
+  Engine.vcxproj -> C:\Users\adilswork\GameLabs\IN2026_ResitCW\IN2026 Coursework Code\lib\Engine.lib

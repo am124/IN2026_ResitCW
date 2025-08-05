@@ -96,6 +96,10 @@ private:
 	shared_ptr<GUILabel> mInstruction5;
 	shared_ptr<GUILabel> mInstruction6;
 	shared_ptr<GUILabel> mInstruction7;
+	shared_ptr<GUILabel> mInstruction8;
+	shared_ptr<GUILabel> mInstruction9;
+
+
 
 	void CreateStartGUI();
 	void HideDefaultGUI();

@@ -523,49 +523,66 @@ void Asteroids::CreateInstructionsGUI() {
 	mInstruction1->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
 	shared_ptr<GUIComponent> instruction1_component
 		= static_pointer_cast<GUIComponent>(mInstruction1);
-	mGameDisplay->GetContainer()->AddComponent(instruction1_component, GLVector2f(0.5f, 0.8f));
+	mGameDisplay->GetContainer()->AddComponent(instruction1_component, GLVector2f(0.5f, 0.9f));
 
 	mInstruction2 = make_shared<GUILabel>("Spacebar to Shoot Spaceship");
 	mInstruction2->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
 	mInstruction2->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
 	shared_ptr<GUIComponent> instruction2_component
 		= static_pointer_cast<GUIComponent>(mInstruction2);
-	mGameDisplay->GetContainer()->AddComponent(instruction2_component, GLVector2f(0.5f, 0.7f));
+	mGameDisplay->GetContainer()->AddComponent(instruction2_component, GLVector2f(0.5f, 0.8f));
 
-	mInstruction3 = make_shared<GUILabel>("Destory The Asteroids");
+	mInstruction3 = make_shared<GUILabel>("Destroy The Asteroids");
 	mInstruction3->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
 	mInstruction3->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
 	shared_ptr<GUIComponent> instruction3_component
 		= static_pointer_cast<GUIComponent>(mInstruction3);
-	mGameDisplay->GetContainer()->AddComponent(instruction3_component, GLVector2f(0.5f, 0.6f));
+	mGameDisplay->GetContainer()->AddComponent(instruction3_component, GLVector2f(0.5f, 0.7f));
 
 	mInstruction4 = make_shared<GUILabel>("Save Your Score At The End (Name)");
 	mInstruction4->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
 	mInstruction4->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
 	shared_ptr<GUIComponent> instruction4_component
 		= static_pointer_cast<GUIComponent>(mInstruction4);
-	mGameDisplay->GetContainer()->AddComponent(instruction4_component, GLVector2f(0.5f, 0.5f));
+	mGameDisplay->GetContainer()->AddComponent(instruction4_component, GLVector2f(0.5f, 0.6f));
 
-	mInstruction5 = make_shared<GUILabel>("View Saved Scores From The Start Menu");
+	mInstruction8 = make_shared<GUILabel>("Following Powerups Available:");
+	mInstruction8->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
+	mInstruction8->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
+	shared_ptr<GUIComponent> instruction8_component
+		= static_pointer_cast<GUIComponent>(mInstruction8);
+	mGameDisplay->GetContainer()->AddComponent(instruction8_component, GLVector2f(0.5f, 0.5f));
+
+	mInstruction5 = make_shared<GUILabel>("- Heart: Extra Life");
 	mInstruction5->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
 	mInstruction5->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
 	shared_ptr<GUIComponent> instruction5_component
 		= static_pointer_cast<GUIComponent>(mInstruction5);
 	mGameDisplay->GetContainer()->AddComponent(instruction5_component, GLVector2f(0.5f, 0.4f));
 
-	mInstruction6 = make_shared<GUILabel>("Change Difficulty From The Start Menu");
+	mInstruction6 = make_shared<GUILabel>("- Shield: Invincible (5 seconds)");
 	mInstruction6->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
 	mInstruction6->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
 	shared_ptr<GUIComponent> instruction6_component
 		= static_pointer_cast<GUIComponent>(mInstruction6);
 	mGameDisplay->GetContainer()->AddComponent(instruction6_component, GLVector2f(0.5f, 0.3f));
 
+	mInstruction9 = make_shared<GUILabel>("- Tuning: Down Arrow Thrust (Permanent)");
+	mInstruction9->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
+	mInstruction9->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
+	shared_ptr<GUIComponent> instruction9_component
+		= static_pointer_cast<GUIComponent>(mInstruction9);
+	mGameDisplay->GetContainer()->AddComponent(instruction9_component, GLVector2f(0.5f, 0.2f));
+
 	mInstruction7 = make_shared<GUILabel>("Press b to Return");
 	mInstruction7->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
 	mInstruction7->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
 	shared_ptr<GUIComponent> instruction7_component
 		= static_pointer_cast<GUIComponent>(mInstruction7);
-	mGameDisplay->GetContainer()->AddComponent(instruction7_component, GLVector2f(0.5f, 0.2f));
+	mGameDisplay->GetContainer()->AddComponent(instruction7_component, GLVector2f(0.5f, 0.1f));
+
+
+	
 }
 
 void Asteroids::HideInstructionsGUI() {
@@ -576,6 +593,8 @@ void Asteroids::HideInstructionsGUI() {
 	mInstruction5->SetVisible(false);
 	mInstruction6->SetVisible(false);
 	mInstruction7->SetVisible(false);
+	mInstruction8->SetVisible(false);
+	mInstruction9->SetVisible(false);
 }
 void Asteroids::ShowInstructionsGUI() {
 	mInstruction1->SetVisible(true);
@@ -585,6 +604,8 @@ void Asteroids::ShowInstructionsGUI() {
 	mInstruction5->SetVisible(true);
 	mInstruction6->SetVisible(true);
 	mInstruction7->SetVisible(true);
+	mInstruction8->SetVisible(true);
+	mInstruction9->SetVisible(true);
 }
 
 void Asteroids::StartControls(int key)
