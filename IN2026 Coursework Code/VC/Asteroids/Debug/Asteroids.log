@@ -1,13 +1,21 @@
 ﻿cl : command line  warning D9035: option 'Gm' has been deprecated and will be removed in a future release
   Asteroids.cpp
+C:\Users\adil\Game Labs\IN2026_ResitCW\IN2026 Coursework Code\src\Asteroids.cpp(437,16): warning C4353: nonstandard extension used: constant 0 as function expression.  Use '__noop' function intrinsic instead
+  Generating Code...
+  Skipping... (no relevant changes detected)
+  main.cpp
+  Explosion.cpp
 Asteroid.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/SAFESEH' specification
-  Asteroids.vcxproj -> C:\Users\adilswork\GameLabs\IN2026_ResitCW\IN2026 Coursework Code\bin\Asteroids.exe
+  Asteroids.vcxproj -> C:\Users\adil\Game Labs\IN2026_ResitCW\IN2026 Coursework Code\bin\Asteroids.exe
   ..\..\assets\asteroid.shape
   ..\..\assets\asteroid1_fs.png
   ..\..\assets\bullet.shape
   ..\..\assets\explosion_fs.png
+  ..\..\assets\gear.png
+  ..\..\assets\heart.png
   ..\..\assets\highscores.txt
+  ..\..\assets\shield.png
   ..\..\assets\spaceship.shape
   ..\..\assets\spaceship_fs.png
   ..\..\assets\thruster.shape
-          8 file(s) copied.
+         11 file(s) copied.

@@ -64,8 +64,17 @@ void Asteroids::Start()
 	Animation *asteroid1_anim = AnimationManager::GetInstance().CreateAnimationFromFile("asteroid1", 128, 8192, 128, 128, "asteroid1_fs.png");
 	Animation *spaceship_anim = AnimationManager::GetInstance().CreateAnimationFromFile("spaceship", 128, 128, 128, 128, "spaceship_fs.png");
 
+	Animation* heart_anim = AnimationManager::GetInstance().CreateAnimationFromFile("heart", 512, 512, 512, 512, "heart.png");
+	Animation* shield_anim = AnimationManager::GetInstance().CreateAnimationFromFile("shield", 512, 512, 512, 512, "shield.png");
+	Animation* gear_anim = AnimationManager::GetInstance().CreateAnimationFromFile("gear", 512, 512, 512, 512, "gear.png");
+
+
+
+	// CUSTOM 
+	
+	// END
 	// Create a spaceship and add it to the world
-	mGameWorld->AddObject(CreateSpaceship());
+	//mGameWorld->AddObject(CreateSpaceship());
 	// Create some asteroids and add them to the world
 	CreateAsteroids(10);
 	
@@ -282,20 +291,30 @@ void Asteroids::OnTimer(int value)
 	}
 	// CUSTOM
 	if (value == SPAWN_EXTRA_LIFE) {
-		SpawnExtraLife();
-		// schedules next spawn
-		SetTimer(28000, SPAWN_EXTRA_LIFE);
+		// when game over stop spawning extras 
+		if (mGameStart == true) {
+			SpawnExtraLife();
+			// schedules next spawn
+			SetTimer(28000, SPAWN_EXTRA_LIFE);
+		}
+	
 	}
 	if (value == SPAWN_INVINCIBLE) {
-		SpawnInvincible();
-		SetTimer(20000, SPAWN_INVINCIBLE);
+		if (mGameStart == true) {
+			SpawnInvincible();
+			SetTimer(20000, SPAWN_INVINCIBLE);
+		}
+	
 
 	}
 	if (value == END_INVINCIBILITY) {
 		mPlayer.DisableInvincibility();
 	}
 	if (value == SPAWN_TUNING) {
-		SpawnTuning();
+		if (mGameStart == true) {
+			SpawnTuning();
+		}
+		
 	}
 	
 	// END 
@@ -415,8 +434,8 @@ void Asteroids::OnPlayerKilled(int lives_left)
 	else
 	{
 		CreateScoreSaveGUI();
-		//CreateAskNameGUI();
-		// SetTimer(500, SHOW_GAME_OVER);
+		mGameStart = false();
+		
 	}
 }
 
@@ -577,6 +596,8 @@ void Asteroids::StartControls(int key)
 		CreateGUI();
 		mGameStart = true;
 		// CUSTOM
+		// Create a spaceship and add it to the world
+		mGameWorld->AddObject(CreateSpaceship());
 		// spawns first life, here use a boolean for difficulty to change timer
 		if (!mIsHard) {
 			SetTimer(28000, SPAWN_EXTRA_LIFE);
@@ -764,11 +785,17 @@ void Asteroids::CreateDifficultyGUI() {
 	mGameDisplay->GetContainer()->AddComponent(
 		static_pointer_cast<GUIComponent>(mCurrentDifficultyLabel), GLVector2f(0.5f, 0.3f));
 
+	mTipLabel = make_shared<GUILabel>("(Hard mode disables powerups)");
+	mTipLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
+	mTipLabel->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
+	mGameDisplay->GetContainer()->AddComponent(
+		static_pointer_cast<GUIComponent>(mTipLabel), GLVector2f(0.5f, 0.2f));
+
 	mBackLabelDifficulty = make_shared<GUILabel>("Press b to Return");
 	mBackLabelDifficulty->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
 	mBackLabelDifficulty->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
 	mGameDisplay->GetContainer()->AddComponent(
-		static_pointer_cast<GUIComponent>(mBackLabelDifficulty), GLVector2f(0.5f, 0.2f));
+		static_pointer_cast<GUIComponent>(mBackLabelDifficulty), GLVector2f(0.5f, 0.1f));
 
 }
 void Asteroids::HideDifficultyGUI() {
@@ -777,6 +804,7 @@ void Asteroids::HideDifficultyGUI() {
 	mHardOptionLabel->SetVisible(false);
 	mCurrentDifficultyLabel->SetVisible(false);
 	mBackLabelDifficulty->SetVisible(false);
+	mTipLabel->SetVisible(false);
 	mDifficultyScreen = false;
 }
 
@@ -795,47 +823,49 @@ void Asteroids::OnPlayerPickedUpLife(int lives_left)
 void Asteroids::SpawnExtraLife()
 {
 	// Create the pickup
-
-	Animation* anim_ptr = AnimationManager::GetInstance().GetAnimationByName("spaceship");
+	Animation* anim_ptr = AnimationManager::GetInstance().GetAnimationByName("heart");
 	shared_ptr<Sprite> extralife_sprite
 		= make_shared<Sprite>(anim_ptr->GetWidth(), anim_ptr->GetHeight(), anim_ptr);
-	extralife_sprite->SetLoopAnimation(true);
+	extralife_sprite->SetLoopAnimation(false);
 	shared_ptr<GameObject> extralife = make_shared<ExtraLives>();
 	extralife->SetBoundingShape(make_shared<BoundingSphere>(extralife->GetThisPtr(), 10.0f));
 	extralife->SetSprite(extralife_sprite);
-	extralife->SetScale(0.08f);
+	extralife->SetScale(0.02);
 	GLfloat x = rand() % 200 - 100; // example range: [-100, 100]
 	GLfloat y = rand() % 200 - 100;
 	extralife->SetPosition(GLVector3f(x, y, 0));;
+	extralife->SetRotation(30);
 	mGameWorld->AddObject(extralife);
 }
 void Asteroids::SpawnInvincible() {
-	Animation* anim_ptr = AnimationManager::GetInstance().GetAnimationByName("asteroid1");
+	Animation* anim_ptr = AnimationManager::GetInstance().GetAnimationByName("shield");
 	shared_ptr<Sprite> invincible_sprite
 		= make_shared<Sprite>(anim_ptr->GetWidth(), anim_ptr->GetHeight(), anim_ptr);
-	invincible_sprite->SetLoopAnimation(true);
+	invincible_sprite->SetLoopAnimation(false);
 	shared_ptr<GameObject> invincible = make_shared<Invincible>();
 	invincible->SetBoundingShape(make_shared<BoundingSphere>(invincible->GetThisPtr(), 10.0f));
 	invincible->SetSprite(invincible_sprite);
-	invincible->SetScale(0.08f);
+	invincible->SetScale(0.02);
 	GLfloat x = rand() % 200 - 100; // example range: [-100, 100]
 	GLfloat y = rand() % 200 - 100;
 	invincible->SetPosition(GLVector3f(x, y, 0));;
+	invincible->SetRotation(30);
 	mGameWorld->AddObject(invincible);
 
 }
 void Asteroids::SpawnTuning() {
-	Animation* anim_ptr = AnimationManager::GetInstance().GetAnimationByName("spaceship");
+	Animation* anim_ptr = AnimationManager::GetInstance().GetAnimationByName("gear");
 	shared_ptr<Sprite> tuning_sprite
 		= make_shared<Sprite>(anim_ptr->GetWidth(), anim_ptr->GetHeight(), anim_ptr);
-	tuning_sprite->SetLoopAnimation(true);
+	tuning_sprite->SetLoopAnimation(false);
 	shared_ptr<GameObject> tuning = make_shared<Tuning>();
 	tuning->SetBoundingShape(make_shared<BoundingSphere>(tuning->GetThisPtr(), 10.0f));
 	tuning->SetSprite(tuning_sprite);
-	tuning->SetScale(0.14f);
+	tuning->SetScale(0.02);
 	GLfloat x = rand() % 200 - 100; // example range: [-100, 100]
 	GLfloat y = rand() % 200 - 100;
 	tuning->SetPosition(GLVector3f(x, y, 0));;
+	tuning->SetRotation(30);
 	mGameWorld->AddObject(tuning);
 }
 

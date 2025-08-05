@@ -139,6 +139,7 @@ private:
 	shared_ptr<GUILabel> mHardOptionLabel;
 	shared_ptr<GUILabel> mCurrentDifficultyLabel;
 	shared_ptr<GUILabel> mBackLabelDifficulty;
+	shared_ptr<GUILabel> mTipLabel;
 	void CreateDifficultyGUI();
 	void HideDifficultyGUI();
 
