@@ -587,7 +587,7 @@ void Asteroids::CreateInstructionsGUI() {
 		= static_pointer_cast<GUIComponent>(mInstruction6);
 	mGameDisplay->GetContainer()->AddComponent(instruction6_component, GLVector2f(0.5f, 0.3f));
 
-	mInstruction9 = make_shared<GUILabel>("- Tuning: Down Arrow Thrust (Permanent)");
+	mInstruction9 = make_shared<GUILabel>("- Tuning: Back Thrust & Enhanced Turning");
 	mInstruction9->SetVerticalAlignment(GUIComponent::GUI_VALIGN_TOP);
 	mInstruction9->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
 	shared_ptr<GUIComponent> instruction9_component
