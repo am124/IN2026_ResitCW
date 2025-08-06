@@ -194,25 +194,45 @@ void Asteroids::OnKeyReleased(uchar key, int x, int y) {}
 void Asteroids::OnSpecialKeyPressed(int key, int x, int y)
 {
 	if (mGameStart == true) {
-		// CUSTOM
-		if (key == GLUT_KEY_DOWN && mTuningPickedUp) {
-			mSpaceship->Thrust(-12);
+		if (mTuningPickedUp) {
+			// Handle tuning-specific controls
+			switch (key) {
+			case GLUT_KEY_DOWN:
+				mSpaceship->Thrust(-12);
+				break;
+			case GLUT_KEY_LEFT:
+				mSpaceship->Rotate(140);
+				break;
+			case GLUT_KEY_RIGHT:
+				mSpaceship->Rotate(-140);
+				break;
+			case GLUT_KEY_UP:
+				mSpaceship->Thrust(10);
+				break;
+			default:
+
+				break;
+			}
 		}
-		// END 
-		switch (key)
-		{
-			// If up arrow key is pressed start applying forward thrust
-		case GLUT_KEY_UP: mSpaceship->Thrust(10); break;
-			// If left arrow key is pressed start rotating anti-clockwise
-		case GLUT_KEY_LEFT: mSpaceship->Rotate(90); break;
-			// If right arrow key is pressed start rotating clockwise
-		case GLUT_KEY_RIGHT: mSpaceship->Rotate(-90); break;
-			// Default case - do nothing
-		default: break;
+		else {
+			// Handle standard controls when tuning is NOT picked up
+			switch (key) {
+			case GLUT_KEY_UP:
+				mSpaceship->Thrust(10);
+				break;
+			case GLUT_KEY_LEFT:
+				mSpaceship->Rotate(90);
+				break;
+			case GLUT_KEY_RIGHT:
+				mSpaceship->Rotate(-90);
+				break;
+			default:
+				// Handle other keys if needed, or do nothing
+				break;
+			}
 		}
 	}
-	
-	
+
 }
 
 void Asteroids::OnSpecialKeyReleased(int key, int x, int y)
